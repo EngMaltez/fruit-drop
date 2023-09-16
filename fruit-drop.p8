@@ -2,6 +2,72 @@ pico-8 cartridge // http://www.pico-8.com
 version 32
 __lua__
 
+basket_sprite=1
+player_sprite=2
+
+player_x=64
+player_y=100
+
+fruits={}
+fruit_start=16
+fruit_count=6
+fruit_interval=16
+
+gravity=1
+level=1
+points=0
+
+function _init()
+	for i=1,level do
+		fruit={
+			sprite=flr(rnd(fruit_count)+fruit_start),
+			x=flr(rnd(120)+5),
+			y=i*(-fruit_interval)
+		}
+		add(fruits,fruit)
+	end
+end
+
+function _update()
+	if btn(⬅️) then player_x -= 2 end	 
+	if btn(➡️) then player_x += 2 end
+	
+	for fruit in all(fruits) do
+		fruit.y += gravity
+		
+		if  fruit.y+4 >= player_y-8
+		and fruit.y+4 <= player_y
+		and fruit.x+4 >= player_x
+		and fruit.y+4 <= player_y+8
+		then
+			points += 1
+			del(fruits, fruit)
+		end
+		
+		if fruit.y > 100 then
+			del(fruits,fruit)
+		end
+	end
+	
+	if #fruits == 0 then
+		level += 1
+		_init()
+	end
+end
+
+function _draw()
+	cls()
+	rectfill(0,108,127,127,3)
+	spr(player_sprite, player_x, player_y)
+	spr(basket_sprite, player_x, player_y-8)
+	
+	for fruit in all(fruits) do
+		spr(fruit.sprite, fruit.x, fruit.y)
+	end
+
+	print("score= "..points)	
+end
+
 __gfx__
 0000000006666660f044440f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000070000006f0ffff0f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
